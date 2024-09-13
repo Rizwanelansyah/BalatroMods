@@ -1,0 +1,17 @@
+{
+  "$schema": "https://raw.githubusercontent.com/sumneko/vscode-lua/master/setting/schema.json",
+  "workspace.library": [
+    "./module"
+  ],
+  "diagnostics.globals": [
+    "G",
+    "localize",
+    "pseudorandom",
+    "card_eval_status_text",
+    "delay",
+    "Event",
+    "ease_hands_played",
+    "hand_chips",
+    "mult"
+  ]
+}
