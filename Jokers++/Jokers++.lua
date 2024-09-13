@@ -45,6 +45,10 @@ Atlas {
   key = "MidasJoker",
   path = "midas_joker.png",
 }
+Atlas {
+  key = "ReverseJoker",
+  path = "reverse_joker.png",
+}
 
 SMODS.Joker {
   key = "statue",
@@ -78,7 +82,7 @@ SMODS.Joker {
         card.ability.extra.mult = card.ability.extra.mult + (unscored_card * card.ability.extra.scaling)
 
         return {
-          extra = { message = localize('k_val_up'), colour = G.C.MULT },
+          message = localize('k_val_up'),
           colour = G.C.MULT,
         }
       end
@@ -120,7 +124,7 @@ SMODS.Joker {
       return ctx.destroying_card.ability.effect == "Stone Card"
     elseif ctx.joker_main then
       return {
-        chips_mod = card.ability.extra.chips,
+        chip_mod = card.ability.extra.chips,
         message = localize { type = "variable", key = "a_chips", vars = { card.ability.extra.chips } },
         colour = G.C.CHIPS,
       }
@@ -129,7 +133,9 @@ SMODS.Joker {
   calc_dollar_bonus = function(self, card)
     local money = card.ability.extra.total_money_gain
     card.ability.extra.total_money_gain = 0
-    return money
+    if money > 0 then
+      return money
+    end
   end,
   config = { extra = { chips = 0, odds = 4, money_gain = 3, total_money_gain = 0 } },
   rarity = Rarity.Rare,
@@ -185,6 +191,32 @@ SMODS.Joker {
   end,
   rarity = Rarity.Uncommon,
   cost = 6,
+  unlocked = true,
+  discovered = true,
+}
+
+SMODS.Joker {
+  key = "reverse",
+  atlas = "ReverseJoker",
+  loc_txt = {
+    name = "Reverse",
+    text = {
+      "Swap {C:mult}mult{} and {C:chips}chips{}",
+    },
+  },
+  calculate = function(self, card, ctx)
+    if ctx.joker_main then
+      local mod = hand_chips - mult
+      return {
+        mult_mod = mod,
+        chip_mod = -mod,
+        message = "Reverse!",
+        colour = math.random() > 0.5 and G.C.CHIPS or G.C.MULT,
+      }
+    end
+  end,
+  rarity = Rarity.Common,
+  cost = 4,
   unlocked = true,
   discovered = true,
 }
