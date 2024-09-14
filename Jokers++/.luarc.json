@@ -13,6 +13,7 @@
     "ease_hands_played",
     "ease_discard",
     "hand_chips",
-    "mult"
+    "mult",
+    "ease_dollars"
   ]
 }

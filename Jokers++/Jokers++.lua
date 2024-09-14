@@ -33,13 +33,6 @@ function jpp_util.ls(path)
   return t
 end
 
-local jokers = {}
-local jokers_path = mod_path .. "\\module\\jpp\\jokers"
-local files = jpp_util.ls(jokers_path)
-for _, name in ipairs(files) do
-  table.insert(jokers, name)
-end
-
 local function create_atlas(image, forced_key)
   local key = forced_key or image:match("^[^.]+")
   SMODS.Atlas {
@@ -49,6 +42,13 @@ local function create_atlas(image, forced_key)
     py = 95,
   }
   return key
+end
+
+local jokers = {}
+local jokers_path = mod_path .. "\\module\\jpp\\jokers"
+local files = jpp_util.ls(jokers_path)
+for _, name in ipairs(files) do
+  table.insert(jokers, name)
 end
 
 for _, mod in ipairs(jokers) do
