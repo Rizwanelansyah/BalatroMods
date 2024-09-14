@@ -1,5 +1,4 @@
 local j = {
-  key = "statue",
   atlas = "file:statue_of_joker.png",
   config = { extra = { mult = 0, scaling = 1, } },
   cost = 4,

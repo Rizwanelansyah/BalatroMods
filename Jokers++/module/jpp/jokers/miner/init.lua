@@ -18,7 +18,8 @@ j.loc_txt = {
   }
 }
 
-function j:loc_vars(_, card)
+function j:loc_vars(info_queue, card)
+  table.insert(info_queue, G.P_CENTERS.m_stone)
   return { vars = { card.ability.extra.chips, G.GAME.probabilities.normal or 1, card.ability.extra.odds, card.ability.extra.money_gain } }
 end
 
@@ -41,6 +42,7 @@ function j:calculate(card, ctx)
       chip_mod = card.ability.extra.chips,
       message = localize { type = "variable", key = "a_chips", vars = { card.ability.extra.chips } },
       colour = G.C.CHIPS,
+      card = ctx.blueprint_card or card,
     }
   end
 end

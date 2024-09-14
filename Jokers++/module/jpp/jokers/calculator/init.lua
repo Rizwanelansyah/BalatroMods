@@ -1,4 +1,4 @@
-local function get_random_op()
+local function random_op()
   local v = math.random()
   if v > 0.6 then
     return "Add"
@@ -11,7 +11,7 @@ local function get_random_op()
   end
 end
 
-local function calcjoker_redraw(card)
+local function redraw(card)
   card.config.center.atlas = "jpp_CalculatorJoker" .. card.ability.extra.operator
   card:set_sprites(card.config.center)
 end
@@ -39,8 +39,8 @@ local symbols = {
 local j = {
   key = "calculator",
   atlas = {
-    main_CalculatorJokerAdd = "calculator_add.png",
-    CalculatorJokerSubract = "calculator_subtract.png",
+    CalculatorJokerAdd = "calculator_add.png",
+    CalculatorJokerSubtract = "calculator_subtract.png",
     CalculatorJokerMulti = "calculator_multi.png",
     CalculatorJokerDivide = "calculator_divide.png",
   },
@@ -69,14 +69,14 @@ function j:loc_vars(info_queue, card)
 end
 
 function j:set_ability(card, initial, delay_sprites)
-  card.ability.extra.operator = get_random_op()
+  card.ability.extra.operator = random_op()
 end
 
 function j:update(card, dt)
   local new_atlas = "jpp_CalculatorJoker" .. card.ability.extra.operator
   local old_atlas = card.config.center.atlas
   if new_atlas ~= old_atlas then
-    calcjoker_redraw(card)
+    redraw(card)
   end
 end
 
@@ -85,14 +85,14 @@ function j:calculate(card, ctx)
     G.E_MANAGER:add_event(Event {
       func = function()
         local old_op = card.ability.extra.operator
-        local new_op = get_random_op()
+        local new_op = random_op()
         if old_op ~= new_op then
           card_eval_status_text(card, 'extra', nil, nil, nil,
             { message = "Change!" })
           G.E_MANAGER:add_event(Event {
             func = function()
               card.ability.extra.operator = new_op
-              calcjoker_redraw(card)
+              redraw(card)
               return true
             end
           })
@@ -106,16 +106,17 @@ function j:calculate(card, ctx)
     local min = G.GAME.hands[text].mult
     for _, playing_card in ipairs(G.play.cards) do
       local id = playing_card:get_id()
-      if id >= 2 and id <= 10 and not playing_card.debuff and jpp_util.in_table(playing_card, scoring_hand) then
-        result = do_operator(card.ability.extra.operator, result, id)
+      if ((id >= 2 and id <= 10) or id == 14) and not playing_card.debuff and jpp_util.in_table(playing_card, scoring_hand) then
+        local num = id == 14 and 1 or id
+        result = do_operator(card.ability.extra.operator, result, num)
         card_eval_status_text(playing_card, 'extra', nil, nil, nil,
-          { message = string.format("Calc: %s%d", symbols[card.ability.extra.operator], id), colour = G.C.MULT })
+          { message = string.format("Calc: %s%d", symbols[card.ability.extra.operator], num), colour = G.C.MULT })
       end
     end
     if result < min then
       result = min
     end
-    return { mult_mod = result - mult, message = string.format("mult = %d", result), colour = G.C.MULT }
+    return { mult_mod = result - mult, message = string.format("mult = %d", result), colour = G.C.MULT, card = ctx.blueprint or card }
   end
 end
 

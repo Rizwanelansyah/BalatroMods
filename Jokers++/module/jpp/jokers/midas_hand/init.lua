@@ -16,6 +16,7 @@ j.loc_txt = {
 }
 
 function j:loc_vars(info_queue, card)
+  table.insert(info_queue, G.P_CENTERS.m_gold)
   return { vars = { G.GAME.probabilities.normal or 1, card.ability.extra.gold_seal_odds, card.ability.extra.hand } }
 end
 

@@ -25,14 +25,20 @@ function jpp_util.in_table(v, t)
   return false
 end
 
----TODO: Automate this later with listing directories
-local jokers = {
-  "statue",
-  "miner",
-  "midas_hand",
-  "reverse",
-  "calculator",
-}
+function jpp_util.ls(path)
+  local t = {}
+  for dir in io.popen(string.format([[dir "%s" /b]], path)):lines() do
+    table.insert(t, dir)
+  end
+  return t
+end
+
+local jokers = {}
+local jokers_path = mod_path .. "\\module\\jpp\\jokers"
+local files = jpp_util.ls(jokers_path)
+for _, name in ipairs(files) do
+  table.insert(jokers, name)
+end
 
 local function create_atlas(image, forced_key)
   local key = forced_key or image:match("^[^.]+")
@@ -55,46 +61,47 @@ for _, mod in ipairs(jokers) do
   for key, value in pairs(defaults) do
     options[key] = options[key] or value
   end
-  options.rarity = ({
+  options.rarity = type(options.rarity) == "number" and options.rarity or (({
     U = 2,
     R = 3,
     L = 3,
-  })[options.rarity] or 1
+  })[options.rarity] or 1)
 
   local default_loc = options.loc_txt
   local ok, loc = pcall(require, "jpp.jokers." .. mod .. ".loc")
   options.loc_txt = ok and loc or {}
   options.loc_txt.default = default_loc
 
-  local atlas = options.atlas
-  if type(atlas) == "string" then
-    local name, image = string.match(options.atlas, "^file%(([%w%d_]+)%):(.+)$")
-    image = image or string.match(options.atlas, "^file:(.+)$")
-    options.atlas = image and create_atlas(image, name) or atlas
-  elseif type(atlas) == "table" then
-    local key
-    if atlas[1] then
-      for i, image in ipairs(atlas) do
-        if image then
-          create_atlas(image)
-          if i == 1 then
-            key = create_atlas(image)
+  if options.atlas then
+    local atlas = options.atlas
+    if type(atlas) == "string" then
+      local name, image = string.match(options.atlas, "^file%(([%w%d_]+)%):(.+)$")
+      image = image or string.match(options.atlas, "^file:(.+)$")
+      options.atlas = image and create_atlas(image, name) or atlas
+    elseif type(atlas) == "table" then
+      local key
+      if atlas[1] then
+        for i, image in ipairs(atlas) do
+          if image then
+            create_atlas(image)
+            if i == 1 then
+              key = create_atlas(image)
+            end
+          end
+        end
+      else
+        local first = true
+        for name, image in pairs(atlas) do
+          if first then
+            key = create_atlas(image, name)
+            first = false
+          else
+            create_atlas(image, name)
           end
         end
       end
-    else
-      local first = true
-      for name, image in pairs(atlas) do
-        local main = string.match(name, "^main_([%w%d_]+)$")
-        if main or first then
-          key = create_atlas(image, main or name)
-          first = false
-        else
-          create_atlas(image, name)
-        end
-      end
+      options.atlas = key
     end
-    options.atlas = key
   end
   SMODS.Joker(options)
 end
