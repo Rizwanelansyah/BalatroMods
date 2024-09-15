@@ -131,4 +131,4 @@ function j:set_ability(card)
   card.ability.extra.prizes = random_prizes()
 end
 
-return j
+return false

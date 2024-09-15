@@ -52,7 +52,10 @@ for _, name in ipairs(files) do
 end
 
 for _, mod in ipairs(jokers) do
-  local options = require("jpp.jokers." .. mod) or {}
+  local options = require("jpp.jokers." .. mod)
+  if not options then
+    goto continue
+  end
   local defaults = {
     key = mod,
     unlocked = true,
@@ -93,17 +96,38 @@ for _, mod in ipairs(jokers) do
         local first = true
         for name, image in pairs(atlas) do
           if first then
-            key = create_atlas(image, name)
+            if type(image) == "string" then
+              key = create_atlas(image, name)
+            else
+              image.key = name
+              image.px = image.px or 71
+              image.py = image.py or 95
+              SMODS.Atlas(image)
+              key = name
+            end
             first = false
           else
-            create_atlas(image, name)
+            if type(image) == "string" then
+              create_atlas(image, name)
+            else
+              image.key = name
+              image.px = image.px or 71
+              image.py = image.py or 95
+              SMODS.Atlas(image)
+            end
           end
         end
       end
       options.atlas = key
     end
   end
-  SMODS.Joker(options)
+  local j = SMODS.Joker(options)
+  if mod == "combo_wombo" then
+    for key, value in pairs(j) do
+      sendInfoMessage(string.format("%s = %s", key, tostring(value)), "J++")
+    end
+  end
+  ::continue::
 end
 
 ----------------------------------------------

@@ -64,7 +64,7 @@ j.loc_txt = {
   name = "Safe",
   text = {
     "When {C:attention}played cards{} contains the {C:attention}password{}, give {C:money}$#1#{} then",
-    "create new {C:attention}password{} and scale up the {C:money}money{},",
+    "create new {C:attention}password{} and increase the {C:money}money{},",
     "current {C:attention}password{}: {C:green}#2#{}",
     "{C:inactive}(Password will reveal each hand played){}",
   },
